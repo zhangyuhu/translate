@@ -226,7 +226,8 @@ UUID处理需要重新加工因为服务奖被用一个自定义的UUID来实现
 	}
 上面的代码片段将增加自定义Base UUID到协议栈，并且存储类型通过sd_ble_uuid_vs_add()在服务结构体中：
 
-3.使用类型在为LED Button服务设置UUID的时候：
+3.使用类型在为LED Button服务设置UUID的时候：  
+
 	ble_uuid.type = p_lbs->uuid_type;
 	ble_uuid.uuid = LBS_UUID_SERVICE;
 	err_code = sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY, &ble_uuid, 
@@ -240,4 +241,8 @@ UUID处理需要重新加工因为服务奖被用一个自定义的UUID来实现
 
 ######4.3.3.2 实现按键特征值
 这个服务将有两个特征值，一个控制led状态，一个反应按键状态。两个静态的方法需要被创建增加特征值到ble_lbs.c中以按键状态开始。
-按键特征值通知按键状态改变，但是也允许对等设备读取按键状态。这是非常相似的行为
+按键特征值通知按键状态改变，但是也允许对等设备读取按键状态。这是与电源服务中电源值是非常相似的行为，因此你能像下面基于你的实现：
+1.找到调用 battery_level_char_add 的方法并且重命名为 button_char_add，如果找到并且替换后尽快工作的话，参数名字也应该是正确的。button_char_add方法期望找到一个参数声明是否支持通知，但是在这种情况下通知支持是想要的。   
+2.移除if语句检查is_notification_supported参数，但是代码要保留。（意思应该是直接把用不到的注释掉）   
+3.确保 char_md fields  被设置为支持通知。
+4.移走所有的关于report声明的代码路径，  p_report_ref参数（来自于if语句中的每个东西，检查p_report_ref是否被设置）
