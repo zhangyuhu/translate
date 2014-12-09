@@ -187,12 +187,12 @@ nRF51822评估套件需要这个应用例程。然而用开发套件修改项目
 2.复制这个文件夹 Board\pca10001\ble\ 并且重命名它为  ble_app_lbs.
 3.在ble_app_libs的子文件夹Arm里面改变项目的名字从ble_app_template改为ble_app_libs 
 #####4.2.3 安装服务
-SDK并没有一个模板服务。但是它有一个电源服务的实现，那是个简单的服务的实现，并且是一个好的自定义服务的起始点。按照下面的步骤开始：
-1. 从 Source\ble\ble_services复制ble_bas.c文件到 Board/pca10001/ble/ble_app_lbs/文件夹下
-2. 从 Include\ble\ble_services复制ble_bas.h到 Board/pca10001/ble/ble_app_lbs/文件夹下
-3. 将ble_bas.c重命名为ble_libs.c,ble_bas.h重命名为ble_lbs.h
-4. 双击工程中的服务文件夹，选择新创建的ble_lbs.c增加ble_lbs.c文件到你的Keil项目
-因为这是一个特定服务的应用，因此更好是一个应用文件夹而不是SDK服务文件夹。
+SDK并没有一个模板服务。但是它有一个电源服务的实现，那是个简单的服务的实现，并且是一个好的自定义服务的起始点。按照下面的步骤开始：   
+1. 从 Source\ble\ble_services复制ble_bas.c文件到 Board/pca10001/ble/ble_app_lbs/文件夹下    
+2. 从 Include\ble\ble_services复制ble_bas.h到 Board/pca10001/ble/ble_app_lbs/文件夹下      
+3. 将ble_bas.c重命名为ble_libs.c,ble_bas.h重命名为ble_lbs.h   
+4. 双击工程中的服务文件夹，选择新创建的ble_lbs.c增加ble_lbs.c文件到你的Keil项目   
+因为这是一个特定服务的应用，因此更好是一个应用文件夹而不是SDK服务文件夹。   
 ####4.3 实现服务
 这个服务被很通用的实现以至于它很容易的被重用在其他的应用程序中。目标是为了打开应用通过初始化，处理事件，和提供IO实现来使用服务。这类似于预定义服务的实现方式。
 #####4.3.1 设计API
@@ -204,9 +204,9 @@ ble_lbs.h头文件实现了应用程序需要实现的各种结构体，一个�
 	注意：内容已经被移到了这个文档的代码片段  
 
 在上面的的代码中，ble_bas_t被用来作为服务的引用然而ble_bas_init_t包含初始化参数以后并不一定有用。所有的AOI方法都以一个指向服务实例的指针作为第一个参数。  
-为了设计一个相似的API为led button服务，按下面的步骤来：
-1.找到并替换所有的ble_bas为ble_lbs
-2.考虑一下来自应用的服务的需求。LED Button服务需要知道按键什么时候状态已经改变，并且被发送到主设备。因此，你需要增加一个方法调用在按键状态改变的时候。  
+为了设计一个相似的API为led button服务，按下面的步骤来：    
+1.找到并替换所有的ble_bas为ble_lbs    
+2.考虑一下来自应用的服务的需求。LED Button服务需要知道按键什么时候状态已经改变，并且被发送到主设备。因此，你需要增加一个方法调用在按键状态改变的时候。       
 
 	uint32_t ble_lbs_init(ble_lbs_t * p_lbs, const ble_lbs_init_t * p_lbs_init);
 	void ble_lbs_on_ble_evt(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt);
@@ -276,29 +276,30 @@ ble_lbs.h头文件实现了应用程序需要实现的各种结构体，一个�
 电源服务事件声明在ble_lbs.h文件中被删除
 
 #####4.3.3 初始化  
-1.在源文件ble_lbs.c中，替换所有出现的ble_bas和p_bas为ble_lbs和p_lbs.
-2.删除ble_lbs_battery_level_updata()函数注释掉所有的其他方法通过使用#if 0和#endif在ble_lbs.c文件的第一个方法之前，在初始化函数之上。不要完全删除它们，因为它们中的一些方法在后面会被使用到。
+1.在源文件ble_lbs.c中，替换所有出现的ble_bas和p_bas为ble_lbs和p_lbs.   
+2.删除ble_lbs_battery_level_updata()函数注释掉所有的其他方法通过使用#if 0和#endif在ble_lbs.c文件的第一个方法之前，在初始化函数之上。不要完全删除它们，因为它们中的一些方法在后面会被使用到。    
 ######4.3.3.1 设计服务初始化 
-在初始化之后，首先看看初始化函数，现在调用ble_lbs_init。下面的参数你不需要将被移除：
-1.移除 evt_handler,  is_notification_supported, 和battery_level_last
-2.重命名 evt_handler为led_write_handler,再初始化结构体和服务结构体
+在初始化之后，首先看看初始化函数，现在调用ble_lbs_init。下面的参数你不需要将被移除：   
+1.移除 evt_handler,  is_notification_supported, 和battery_level_last   
+2.重命名 evt_handler为led_write_handler,再初始化结构体和服务结构体   
 	p_lbs->led_write_handler         = p_lbs_init->led_write_handler;
 
 UUID处理需要重新加工因为服务奖被用一个自定义的UUID来实现代替 Bluetooth  SIG中定义的UUID  
 首先定义一个base UUID 一种方法是在nRFgo Studio中：
-1.打开nRFgo Studio
-2.在 nRF8001 Setup 菜单中，选择Edit 128-bit UUIDs并且点击Add new
+1.打开nRFgo Studio     
+2.在 nRF8001 Setup 菜单中，选择Edit 128-bit UUIDs并且点击Add new    
 
 这将创建一个个新的，随机的UUID你能用来自定义服务。 
-新建的Base UUID必须被包含进源代码文件中作为一个字节数组，但是只在一个地方需要
-1.为了增加可读性，在头文件ble_lbs.h中包含她作为一个宏定义，连同服务和特征值的别名。
+新建的Base UUID必须被包含进源代码文件中作为一个字节数组，但是只在一个地方需要   
+1.为了增加可读性，在头文件ble_lbs.h中包含她作为一个宏定义，连同服务和特征值的别名。  
+
 	#define LBS_UUID_BASE {0x23, 0xD1, 0xBC, 0xEA, 0x5F, 0x78, 0x23, 0x15, 0xDE, 0xEF, 
 	0x12, 0x12, 0x00, 0x00, 0x00, 0x00}
 	#define LBS_UUID_SERVICE 0x1523
 	#define LBS_UUID_LED_CHAR 0x1525
 	#define LBS_UUID_BUTTON_CHAR 0x1524  
 
-在服务初始化中：
+在服务初始化中：   
 2.增加下面的UUID到协议栈列表，然后安装服务并使用它。在ble_lbs_init()中第一次被增加  
 
 	ble_uuid128_t base_uuid = LBS_UUID_BASE;
@@ -323,14 +324,14 @@ UUID处理需要重新加工因为服务奖被用一个自定义的UUID来实现
 以上的代码只是增加了一个空的服务，一次特征值需要被增加。下面的章节将解释怎样实现特征值。
 
 ######4.3.3.2 实现按键特征值
-这个服务将有两个特征值，一个控制led状态，一个反应按键状态。两个静态的方法需要被创建增加特征值到ble_lbs.c中以按键状态开始。
-按键特征值通知按键状态改变，但是也允许对等设备读取按键状态。这是与电源服务中电源值是非常相似的行为，因此你能像下面基于你的实现：
-1.找到调用 battery_level_char_add 的方法并且重命名为 button_char_add，如果找到并且替换后尽快工作的话，参数名字也应该是正确的。button_char_add方法期望找到一个参数声明是否支持通知，但是在这种情况下通知支持是想要的。   
-2.移除if语句检查is_notification_supported参数，但是代码要保留。（意思应该是直接把用不到的注释掉）   
-3.确保 char_md fields  被设置为支持通知。
-4.移走所有的关于report声明的代码路径，  p_report_ref参数（来自于if语句中的每个东西，检查p_report_ref是否被设置）
+这个服务将有两个特征值，一个控制led状态，一个反应按键状态。两个静态的方法需要被创建增加特征值到ble_lbs.c中以按键状态开始。    
+按键特征值通知按键状态改变，但是也允许对等设备读取按键状态。这是与电源服务中电源值是非常相似的行为，因此你能像下面基于你的实现：     
+1.找到调用 battery_level_char_add 的方法并且重命名为 button_char_add，如果找到并且替换后尽快工作的话，参数名字也应该是正确的。button_char_add方法期望找到一个参数声明是否支持通知，但是在这种情况下通知支持是想要的。        
+2.移除if语句检查is_notification_supported参数，但是代码要保留。（意思应该是直接把用不到的注释掉）       
+3.确保 char_md fields  被设置为支持通知。     
+4.移走所有的关于report声明的代码路径，  p_report_ref参数（来自于if语句中的每个东西，检查p_report_ref是否被设置）      
 有一个标志位在电源服务初始化中用来设置安全模式为CCCD，并且被存储在ble_gap_conn_sec_mode_t 这个结构体中。这样的结构体很容易通过使用来自 ble_gap.h中的以ble_gap_conn_sec_mode开头的宏来设置。有不同的宏可以使用，依赖于你想要求的这个属性的安全等级。 
-你想要支持一种安全模式可以通过设置两个值，加密模式和安全等级，使用宏。有不同的宏对于不同的使用情况，例如，要求加密，给出给出正常的访问或者只是部分访问：
+你想要支持一种安全模式可以通过设置两个值，加密模式和安全等级，使用宏。有不同的宏对于不同的使用情况，例如，要求加密，给出给出正常的访问或者只是部分访问：      
 1.使用 BLE_GAP_CONN_SEC_MODE_SET_OPEN，这将使得CCCD可读和可写在任何环节下，加密或不加。这同样适用于读和写参数对于按键自己的状态。    
 
 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
@@ -339,15 +340,15 @@ UUID处理需要重新加工因为服务奖被用一个自定义的UUID来实现
 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
 
-2.确保你没有移除vloc字段的设置，那将决定变量是放置在栈内存中或是应用程序内存中。  
-3.设置唯一的权限在将结构体使用memset清零后  
-4.设置类型和值对于得到的正确的UUID值 
+2.确保你没有移除vloc字段的设置，那将决定变量是放置在栈内存中或是应用程序内存中。    
+3.设置唯一的权限在将结构体使用memset清零后    
+4.设置类型和值对于得到的正确的UUID值   
 
 	ble_uuid.type = p_lbs->uuid_type;
 	ble_uuid.uuid = LBS_UUID_BUTTON_CHAR;
 
-5.初始化值是不重要的，因此你可以将p_initial_value 初始化为NULL
-6.确保存储特征值得句柄在正确的地方，向下面一样修改最终的调用方法。
+5.初始化值是不重要的，因此你可以将p_initial_value 初始化为NULL  
+6.确保存储特征值得句柄在正确的地方，向下面一样修改最终的调用方法。   
 
 	return ble_gatts_characteristic_add(p_lbs->service_handle, &char_md,
 									&attr_char_value,
@@ -357,27 +358,27 @@ UUID处理需要重新加工因为服务奖被用一个自定义的UUID来实现
 
 ######4.3.3.3 实现LED特征值    
 LED特征值需要可读和可写，无任何通知：
-1.复制增加的按键特征值得方法，重命名为led_char_add 
-2.移除cccd_md的引用   
-3.增加写属性代替通知属性（打开写这个特征值） 
+1.复制增加的按键特征值得方法，重命名为led_char_add    
+2.移除cccd_md的引用      
+3.增加写属性代替通知属性（打开写这个特征值）    
 
 	char_md.char_props.write = 1;  
 
-4.改变UUID为 LBS_UUID_LED_CHAR 
+4.改变UUID为 LBS_UUID_LED_CHAR    
 
 	ble_uuid.type = p_lbs->uuid_type;
 	ble_uuid.uuid = LBS_UUID_LED_CHAR;
 
-句柄应该被存储在变量 led_char_handles 中代替 button_char_handles 最终调用的方法像下面这样：
+句柄应该被存储在变量 led_char_handles 中代替 button_char_handles 最终调用的方法像下面这样：  
 
 	return ble_gatts_characteristic_add(p_lbs->service_handle, &char_md,
 									&attr_char_value,
 									&p_lbs->led_char_handles);
 
-再编译之后，你能看到现在没有被使用到的属性，移除它们（cccd_md, err_code）  
+再编译之后，你能看到现在没有被使用到的属性，移除它们（cccd_md, err_code）    
 
 ######4.3.3.4 增加特征值 
-在增加完创建特征值得方法后，你需要调用它们在服务的初始化方法的后面。下面是怎样使用的例程：  
+在增加完创建特征值得方法后，你需要调用它们在服务的初始化方法的后面。下面是怎样使用的例程：    
 
 	// Add characteristics
 	err_code = button_char_add(p_lbs, p_lbs_init);
@@ -392,23 +393,23 @@ LED特征值需要可读和可写，无任何通知：
 	}
 	return NRF_SUCCESS;  
 
-因为有任何错误都将立即被返回，如果你到达了函数的末尾，说明你成功了。
+因为有任何错误都将立即被返回，如果你到达了函数的末尾，说明你成功了。   
 
-如果你想现在进行测试，你你能到4.4.1节 23页的“Modifying the template for the Evaluation Kit“和24页的4.4.3“Including the service”节看看，完成进行测试将在29页第五章“Testing the Application”。在测试之后，你就可以连接设备并且发现所有的服务，但是更进一步的动作将不会工作。处理协议栈事件和按键事件需要在服务中被实现。   
+如果你想现在进行测试，你你能到4.4.1节 23页的“Modifying the template for the Evaluation Kit“和24页的4.4.3“Including the service”节看看，完成进行测试将在29页第五章“Testing the Application”。在测试之后，你就可以连接设备并且发现所有的服务，但是更进一步的动作将不会工作。处理协议栈事件和按键事件需要在服务中被实现。       
 
 #####4.3.4 处理协议栈事件  
 
-一个协议栈事件发生在连接建立，写一个特征值或者描述符等等时间的时候。对于应用程序来说，给led写特征值是你需要的。然而，为了使通知正确的工作，你需要存储连接句柄，你能连接或者断开事件。  
+一个协议栈事件发生在连接建立，写一个特征值或者描述符等等时间的时候。对于应用程序来说，给led写特征值是你需要的。然而，为了使通知正确的工作，你需要存储连接句柄，你能连接或者断开事件。     
 作为API的一部分，你定义一个调用 ble_lbs_on_ble_evt 的方法被用来处理协议栈事件。这被分成了不同的方法来处理不同的事件基于一个简单的switch-case语句。    
-######4.3.4.1 存储连接句柄  
+######4.3.4.1 存储连接句柄     
 电源服务已经存储了连接句柄，查找和替换前面还没有任何改变的部分
 ######4.3.4.2 移除CCCD写的处理   
 前面存在的事件句柄监听CCCD的写事件并通过它们传递给应用的电源服务句柄，然而，在这个程序中，这并不重要。   
-文档中发送通知的方法，sd_ble_gatts_hvx() 如果CCCD没有被打开它将不允许通知被发送，因此你不需要再应用中检查出了在SoftDevice里面进行检查之外。    
-你可以移除所有当前的在 on_write方法中的内容了。   
+文档中发送通知的方法，sd_ble_gatts_hvx() 如果CCCD没有被打开它将不允许通知被发送，因此你不需要再应用中检查出了在SoftDevice里面进行检查之外。      
+你可以移除所有当前的在 on_write方法中的内容了。      
 ######4.3.4.3 LED特征值写处理 
-在led特征值被改写的时候你添加到数据结构的函数指针将允许应用程序通知。这应该在on_write方法中被处理。 
-写时的基本的任务是确认写入了正确的特征值，确认它有正确的大小，及一个处理被设置。如果这所有的都是正确的，处理就能被调用无论写入了什么值。因此，on_write的内容变成了下面这样：
+在led特征值被改写的时候你添加到数据结构的函数指针将允许应用程序通知。这应该在on_write方法中被处理。       
+写时的基本的任务是确认写入了正确的特征值，确认它有正确的大小，及一个处理被设置。如果这所有的都是正确的，处理就能被调用无论写入了什么值。因此，on_write的内容变成了下面这样：  
 
 	ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 	if ((p_evt_write->handle == p_lbs->led_char_handles.value_handle) &&
@@ -421,8 +422,8 @@ LED特征值需要可读和可写，无任何通知：
 实际的LED灯的切换留给应用程序，使服务容易的按原样重用，尽管不同的引脚分配给LED和按键。  
 
 #####4.3.5 按键按压处理  
-你已经增加了一个API方法在按键被按下的时候让服务知道。但还没有被实现，因此你需要增加它通过从头文件中复制定义。在处理按键按压的时候，你想发送一个通知到对等的设备带着新的按键状态。SoftDevice API 通过调用 sd_ble_gatts_hvx,并带着一个连接句柄和一个ble_gatts_hvx_params_t作为参数。然后接管进程在值被通知到的时候。  
-在ble_gatts_hvx_params_t结构体中，你 可以设置你是否想要一个通知或者指示，属性句柄被通知，新的数据和新的数据长度。方法看上去像下面：  
+你已经增加了一个API方法在按键被按下的时候让服务知道。但还没有被实现，因此你需要增加它通过从头文件中复制定义。在处理按键按压的时候，你想发送一个通知到对等的设备带着新的按键状态。SoftDevice API 通过调用 sd_ble_gatts_hvx,并带着一个连接句柄和一个ble_gatts_hvx_params_t作为参数。然后接管进程在值被通知到的时候。     
+在ble_gatts_hvx_params_t结构体中，你 可以设置你是否想要一个通知或者指示，属性句柄被通知，新的数据和新的数据长度。方法看上去像下面：     
 
 	uint32_t ble_lbs_on_button_change(ble_lbs_t * p_lbs, uint8_t button_state)
 	{
@@ -436,31 +437,31 @@ LED特征值需要可读和可写，无任何通知：
 		return sd_ble_gatts_hvx(p_lbs->conn_handle, &params);
 	}
 
-那也是可能的第一次设置特征值通过使用sd_ble_gatts_value_set()，然后通知没有设置值或者长度通过调用sd_ble_gatts_hvx()。然而使用sd_ble_gatts_hvx()做事情是必要的，这是一个清楚的方法。使用方法sd_ble_gatts_value_set()来更新可读的值（但是不是notify-able），因为函数并没有发送通知
-服务结论，例程的其他部分将实现应用程序   
+那也是可能的第一次设置特征值通过使用sd_ble_gatts_value_set()，然后通知没有设置值或者长度通过调用sd_ble_gatts_hvx()。然而使用sd_ble_gatts_hvx()做事情是必要的，这是一个清楚的方法。使用方法sd_ble_gatts_value_set()来更新可读的值（但是不是notify-able），因为函数并没有发送通知     
+服务结论，例程的其他部分将实现应用程序     
 
 #### 4.4 应用实现  
 #####4.4.1 为评估套件修改模板  
-一些修改是必须的对于使用评估套件的模板应用程序，而不是开发套件。  
-你需要修改main.c，包括对于正确的套件的引脚定义。向下面那样改变ble_nrf6310_pins.h 为 ble_eval_board_pins.h：
+一些修改是必须的对于使用评估套件的模板应用程序，而不是开发套件。    
+你需要修改main.c，包括对于正确的套件的引脚定义。向下面那样改变ble_nrf6310_pins.h 为 ble_eval_board_pins.h：  
 
 	#include "ble_eval_board_pins.h"
 
-1.移除包含的ble_error_log.h,，那是不需要的  
+1.移除包含的ble_error_log.h,，那是不需要的    
 2.在main.c里，在button_init中改变WAKEUP_BUTTON_PIN NRF6310_BUTTON_0 to
-EVAL_BOARD_BUTTON_0的定义    
-3.移除nrf_gpio_pin_set(ASSERT_LED_PIN_NO)来自应用程序的错误处理函数  
+EVAL_BOARD_BUTTON_0的定义      
+3.移除nrf_gpio_pin_set(ASSERT_LED_PIN_NO)来自应用程序的错误处理函数    
 4.移除leds_init()中的GPIO_LED_CONFIG(ASSERT_LED_PIN_NO)
 
 代替assert LED,你需要一个在服务中使用的LED灯，因此增加led引脚的定义在main.c的最上面   
 
 	#define LEDBUTTON_LED_PIN_NO EVAL_BOARD_LED_0
 
-然后，在leds_init()，配置它作为一个LED： 
+然后，在leds_init()，配置它作为一个LED：   
 
 	GPIO_LED_CONFIG(LEDBUTTON_LED_PIN_NO);
 
-在SDKs 4.1.0和更新版本中，默认应用错误处理执行重置在错误发生的时候，但是为了开发使用提供的调试模块是非常有用的。你应该确保取消调试处理的注释，为重置添加注释：
+在SDKs 4.1.0和更新版本中，默认应用错误处理执行重置在错误发生的时候，但是为了开发使用提供的调试模块是非常有用的。你应该确保取消调试处理的注释，为重置添加注释：   
 
 	void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t *
 		p_file_name)
@@ -481,14 +482,14 @@ SDK包含了调度模块来提供一种机制用来处理事件和来自主程�
 app_button）  
 为了得到关于调度的更详细的信息，请查看nRF51 SDK 文档。  
 #####4.4.3 包含服务  
-为了使用你创建的服务，你需要增加代码到模板应用中。
-在main.c文件中，有一个调用services_init的方法在初始化LED 按键服务的地方必须发生：
+为了使用你创建的服务，你需要增加代码到模板应用中。   
+在main.c文件中，有一个调用services_init的方法在初始化LED 按键服务的地方必须发生：   
 1.增加ble_lbs.h的包含在main.c的最顶部：
 
 	#include "ble_lbs.h"
 
-2.如果还没有做，增加服务的原文件到项目。右键服务文件夹在Project explorer的左边，点击Add file并且选择ble_lbs.c文件. 
-3为服务增加一个数据结构作为一个全局的变量在main.c文件中：
+2.如果还没有做，增加服务的原文件到项目。右键服务文件夹在Project explorer的左边，点击Add file并且选择ble_lbs.c文件.    
+3为服务增加一个数据结构作为一个全局的变量在main.c文件中：   
 
 	static ble_lbs_t m_lbs;
 	注意：尽管这作为一个静态变量存储在main.c文件中，，m_lbs，它将经常出现作为这个变量的指针，因此被称为p_lbs.  
@@ -504,7 +505,7 @@ app_button）
 		APP_ERROR_CHECK(err_code);
 	}
 
-在第22页的4.3.4.3节“Handling LED characteristic writes” 中，我们创建的服务调用led_write_handler在服务结构体中当LED特征值被写入的时候。我们传递的函数将通过上面的init结构被调用，但是这个函数我们还没有定义在应用中。 
+在第22页的4.3.4.3节“Handling LED characteristic writes” 中，我们创建的服务调用led_write_handler在服务结构体中当LED特征值被写入的时候。我们传递的函数将通过上面的init结构被调用，但是这个函数我们还没有定义在应用中。   
 5.设置LED输出在给出的led_write_handler状态，向下面这样：
 
 	 Static void led_write_handler(ble_lbs_t * p_lbs, uint8_t led_state)
@@ -519,7 +520,7 @@ app_button）
 		}
 	}
 
-6.最后，增加服务的事件句柄为应用的事件调度：
+6.最后，增加服务的事件句柄为应用的事件调度：    
 
 	static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 	{
@@ -529,15 +530,15 @@ app_button）
 	}
 
 #####4.4.4 测试它
-现在可以做个快速的测试了，如29页第五章中“Testing the Application”所示，通过使用主控制器，你应该能打开LED通过向led特征值写‘1’  
-#####4.4.5 按键处理  
-为了完成应用，你需要定义怎样处理按键按下。使用 app_button模块那是SDK的一部分。这个模块讲给出一个回调对于每次按键按下，本质上是使特征值切换它的状态对于每次按下。
-在buttons_init，设置你想使用的按键，这里使用评估套件里的按键1   
-1.增加一个新的定义，只是为了使代码更加可读： 
+现在可以做个快速的测试了，如29页第五章中“Testing the Application”所示，通过使用主控制器，你应该能打开LED通过向led特征值写‘1’     
+#####4.4.5 按键处理     
+为了完成应用，你需要定义怎样处理按键按下。使用 app_button模块那是SDK的一部分。这个模块讲给出一个回调对于每次按键按下，本质上是使特征值切换它的状态对于每次按下。   
+在buttons_init，设置你想使用的按键，这里使用评估套件里的按键1     
+1.增加一个新的定义，只是为了使代码更加可读：    
 
 	#define LEDBUTTON_BUTTON_PIN_NO EVAL_BOARD_BUTTON_1
 
-2.为了安装引脚在buttons_init中，增加按键配置数组像下面这样： 
+2.为了安装引脚在buttons_init中，增加按键配置数组像下面这样：    
 
 	static app_button_cfg_t buttons[] =
 	{
@@ -547,8 +548,8 @@ app_button）
 		APP_BUTTON_INIT(buttons, sizeof(buttons) / sizeof(buttons[0]),
 		BUTTON_DETECTION_DELAY, true);
 
-评估套件上的按键是低电平有效，一次设为false，但是它们没有外部上拉。你将打开内部上拉通过使用NRF_GPIO_PIN_PULLUP。按键唤醒无关紧要，因此句柄设置为NULL，在这之后，你将初始化模块。   
-3.在button_event_handler中，发送上次相反的状态通过LED按键服务的API方法。这将确保按键的状态如下图所示的切换在每次按下时：  
+评估套件上的按键是低电平有效，一次设为false，但是它们没有外部上拉。你将打开内部上拉通过使用NRF_GPIO_PIN_PULLUP。按键唤醒无关紧要，因此句柄设置为NULL，在这之后，你将初始化模块。      
+3.在button_event_handler中，发送上次相反的状态通过LED按键服务的API方法。这将确保按键的状态如下图所示的切换在每次按下时：     
 
 	static void button_event_handler(uint8_t pin_no)
 	{
@@ -572,7 +573,7 @@ app_button）
 	}
 
 
-另外定义一个方法，你需要确保按键模块被打开。默认，模板应用建议连接或断开事件，在这使用case也是ok的。取消掉调用app_button_enable() 和 app_button_disable()的定义：
+另外定义一个方法，你需要确保按键模块被打开。默认，模板应用建议连接或断开事件，在这使用case也是ok的。取消掉调用app_button_enable() 和 app_button_disable()的定义：   
 
 	switch (p_ble_evt->header.evt_id)
 	{
@@ -591,13 +592,13 @@ app_button）
 			}
 			break;
 
-你现在要准备测试所要求的函数应用了，详细描述在29页第五章中“Testing the Application”。然而，为了能容易的区别服务在主设备扫描的时候，增加服务的uuid为广播包是非常有用的。 
+你现在要准备测试所要求的函数应用了，详细描述在29页第五章中“Testing the Application”。然而，为了能容易的区别服务在主设备扫描的时候，增加服务的uuid为广播包是非常有用的。      
 #####4.4.6 增加服务UUID为广播包 
 使用在广播包里的UUID打开主设备使用这些信息决定它是否将要连接。在上面第6页2.1.2节广播中有提到，一个广播包可以包含31个字节，但是如果需要额外的数据，一个扫描反馈应可以发送。  
 你将需要增加自定义的UUID，它是16个字节，针对于扫描包因为在它的广播包里没有地方了。     
-广播数据被安装在main.c函数中的advertising_init()函数中，那将设置数据结构并且调用ble_advdata_set()。这个方法携带两个相同类型的参数一个针对于广播包一个针对扫描反馈。你必须增加一个结构体通过扫描反馈参数。  
-UUID然后被设置为LBS_UUID_SERVICE,并且类型是ble_lbs_t结构体中uuid_type字段。  
-advertising_init()应该向下面：
+广播数据被安装在main.c函数中的advertising_init()函数中，那将设置数据结构并且调用ble_advdata_set()。这个方法携带两个相同类型的参数一个针对于广播包一个针对扫描反馈。你必须增加一个结构体通过扫描反馈参数。       
+UUID然后被设置为LBS_UUID_SERVICE,并且类型是ble_lbs_t结构体中uuid_type字段。     
+advertising_init()应该向下面：    
 
 	static void advertising_init(void)
 	{
@@ -620,7 +621,7 @@ advertising_init()应该向下面：
 		APP_ERROR_CHECK(err_code);
 	}
 
-m_lbs结构体中的uuid_type被使用在这儿，确保在main里services_init()被设置，在advertising_init()之前被调用：  
+m_lbs结构体中的uuid_type被使用在这儿，确保在main里services_init()被设置，在advertising_init()之前被调用：      
 
 	int main(void)
 	{
@@ -629,6 +630,6 @@ m_lbs结构体中的uuid_type被使用在这儿，确保在main里services_init(
 		advertising_init();
 		…
 
-现在应用完全完成了。
+现在应用完全完成了。    
 
 ###5 测试应用
